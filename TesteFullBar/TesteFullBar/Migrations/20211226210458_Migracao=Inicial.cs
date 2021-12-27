@@ -16,9 +16,9 @@ namespace TesteFullBar.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RA = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Periodo_Id = table.Column<int>(type: "int", nullable: false),
+                    Periodo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Curso_Id = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: true),
                     Foto = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
