@@ -19,5 +19,6 @@ namespace TesteFullBar.Data
         public DbSet<TesteFullBar.Models.Disciplina> Disciplinas { get; set; }
         public DbSet<TesteFullBar.Models.Curso> Cursos { get; set; }
         public DbSet<TesteFullBar.Models.NotaAluno> NotaAluno { get; set; }
+        public DbSet<TesteFullBar.Models.DisciplinaCurso> DisciplinaCursos { get; set; }
     }
 }

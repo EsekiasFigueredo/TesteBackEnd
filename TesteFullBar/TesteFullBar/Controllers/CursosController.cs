@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TesteFullBar.Data;
 using TesteFullBar.Models;
+using TesteFullBar.VMs;
 
 namespace TesteFullBar.Controllers
 {
@@ -49,7 +50,7 @@ namespace TesteFullBar.Controllers
         public IActionResult Create()
         {
             var listaDisciplinas = _context.Disciplinas.ToList();
-            ViewBag.Disciplina = new SelectList(listaDisciplinas, "Id", "Nome", "[Selecione]");
+            ViewBag.Disciplina = new SelectList(listaDisciplinas, "Id", "Nome_Disciplina");
             return View();
         }
 
@@ -58,12 +59,34 @@ namespace TesteFullBar.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome_Curso,Disciplina_Id")] Curso curso)
+        public async Task<IActionResult> Create([Bind("Id,Nome_Curso,Disciplina_Id")] CursoVM cursoVM)
         {
+            Curso curso = new();
             if (ModelState.IsValid)
             {
+                curso = new Curso()
+                {
+                    Nome_Curso = cursoVM.Nome_Curso
+                };                
                 _context.Add(curso);
                 await _context.SaveChangesAsync();
+                //buscando curso adicionado
+                var cursoAdciconado =  _context.Cursos.Where(o => o.Nome_Curso == cursoVM.Nome_Curso).FirstOrDefault();
+                //Adicionado relação entre disciplinas e curso
+                if (cursoVM.Disciplina_Id != null)
+                {
+                    for (int i = 0; i < cursoVM.Disciplina_Id.Count(); i++)
+                    {
+                        DisciplinaCurso dC = new()
+                        {
+                           Curso_Id = cursoAdciconado.Id,
+                           Disciplina_Id = cursoVM.Disciplina_Id[i]
+                        };
+                        _context.DisciplinaCursos.Add(dC);
+                        _context.SaveChanges();
+                    }
+                }
+
                 return RedirectToAction(nameof(Index));
             }
             return View(curso);
@@ -76,13 +99,21 @@ namespace TesteFullBar.Controllers
             {
                 return NotFound();
             }
-
+            
             var curso = await _context.Cursos.FindAsync(id);
+            CursoVM cursoVM = new() 
+            { 
+                Id = curso.Id,
+                Nome_Curso = curso.Nome_Curso
+            };
+            var disciplinasDoCurso = _context.DisciplinaCursos.ToList();
+            var listaDisciplinas = _context.Disciplinas.ToList();
+            ViewBag.Disciplina = new MultiSelectList(listaDisciplinas, "Id", "Nome_Disciplina",disciplinasDoCurso.Select(o => o.Disciplina_Id)?.ToList());
             if (curso == null)
             {
                 return NotFound();
             }
-            return View(curso);
+            return View(cursoVM);
         }
 
         // POST: Cursos/Edit/5
@@ -90,19 +121,41 @@ namespace TesteFullBar.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome_Curso,Disciplina_Id")] Curso curso)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome_Curso,Disciplina_Id")] CursoVM cursoVM)
         {
-            if (id != curso.Id)
+            Curso curso = new();
+            if (id != cursoVM.Id)
             {
                 return NotFound();
             }
-
+            
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(curso);
+
+                    _context.Cursos.Update(new Curso()
+                    {
+                        Nome_Curso = cursoVM.Nome_Curso
+                    });
                     await _context.SaveChangesAsync();
+                    //buscando curso adicionado
+                    //var cursoAdciconado = _context.Cursos.Where(o => o.Nome_Curso == cursoVM.Nome_Curso).FirstOrDefault();
+                    //Adicionado relação entre disciplinas e curso
+                    //if (cursoVM.Disciplina_Id != null)
+                    //{
+                    //    for (int i = 0; i < cursoVM.Disciplina_Id.Count(); i++)
+                    //    {
+                    //        DisciplinaCurso dC = new()
+                    //        {
+                    //            Curso_Id = cursoAdciconado.Id,
+                    //            Disciplina_Id = cursoVM.Disciplina_Id[i]
+                    //        };
+                    //        _context.DisciplinaCursos.Update(dC);
+                    //        await _context.SaveChangesAsync();
+                    //    }
+                    //}
+                   
                 }
                 catch (DbUpdateConcurrencyException)
                 {

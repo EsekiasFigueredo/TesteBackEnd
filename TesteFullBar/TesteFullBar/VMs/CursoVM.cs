@@ -2,14 +2,15 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TesteFullBar.Models
+namespace TesteFullBar.VMs
 {
 
-    public class Curso
+    public class CursoVM
     {
-        [Key]
+        
         public int Id { get; set; }
         public string Nome_Curso  { get; set; } = string.Empty;
+        public List<int>? Disciplina_Id  { get; set; }
 
     }
 }

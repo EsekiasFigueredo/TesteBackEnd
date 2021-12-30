@@ -13,14 +13,12 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Id_Aluno" value="@ViewBag.IdAluno" />
             <div class="form-group">
-                <label asp-for="Id_Aluno" class="control-label"></label>
-                <input asp-for="Id_Aluno" class="form-control" />
-                <span asp-validation-for="Id_Aluno" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Id_Disciplina" class="control-label"></label>
-                <input asp-for="Id_Disciplina" class="form-control" />
+                <label asp-for="Id_Disciplina" class="control-label">Disciplina</label>
+                <select asp-for="Id_Disciplina" class="col-md-10 form-control" asp-items="@ViewBag.Disciplinas">
+                    <option value="">[Selecione]</option>
+                </select>
                 <span asp-validation-for="Id_Disciplina" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -29,14 +27,14 @@
                 <span asp-validation-for="Nota" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Salvar Alteração" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" asp-route-id="@ViewBag.IdAluno">Voltar a lista</a>
 </div>
 
 @section Scripts {

@@ -10,5 +10,7 @@
         public bool? Status { get; set; }
         public string Foto { get; set; } = string.Empty;
 
+        //public virtual Curso Curso { get; set; }
+
     }
 }

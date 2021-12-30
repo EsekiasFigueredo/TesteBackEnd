@@ -1,25 +1,23 @@
 ﻿@model TesteFullBar.Models.NotaAluno
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Adicionando Nota";
 }
 
-<h1>Create</h1>
+<h1>Adicionando Nota</h1>
 
-<h4>NotaAluno</h4>
+<h4>@ViewBag.NomeAluno</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id_Aluno" value="@ViewBag.IdAluno" />
             <div class="form-group">
-                <label asp-for="Id_Aluno" class="control-label"></label>
-                <input asp-for="Id_Aluno" class="form-control" />
-                <span asp-validation-for="Id_Aluno" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Id_Disciplina" class="control-label"></label>
-                <input asp-for="Id_Disciplina" class="form-control" />
+                <label asp-for="Id_Disciplina" class="control-label">Disciplina</label>
+                <select asp-for="Id_Disciplina" class="col-md-10 form-control" asp-items="@ViewBag.Disciplinas">
+                    <option value="">[Selecione]</option>
+                </select>
                 <span asp-validation-for="Id_Disciplina" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -28,14 +26,14 @@
                 <span asp-validation-for="Nota" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Salvar Nota" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" asp-route-id="@ViewBag.IdAluno">Voltar a Lista de Notas</a>
 </div>
 
 @section Scripts {
