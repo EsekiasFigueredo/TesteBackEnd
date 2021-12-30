@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TesteFullBar.Data;
+using TesteFullBar.Logic;
 using TesteFullBar.Models;
 using TesteFullBar.VMs;
 
@@ -15,6 +17,8 @@ namespace TesteFullBar.Controllers
     public class AlunosController : Controller
     {
         private readonly TesteFullBarContext _context;
+        private readonly IWebHostEnvironment _webhostingEnvironment;
+
         public class Periodo
         {
             public string Id { get; set; } = string.Empty;
@@ -40,9 +44,11 @@ namespace TesteFullBar.Controllers
                 };
             }
         }
-        public AlunosController(TesteFullBarContext context)
+        public AlunosController(TesteFullBarContext context, IWebHostEnvironment webhostingEnvironment)
         {
             _context = context;
+            _webhostingEnvironment = webhostingEnvironment;
+
         }
 
         // GET: Alunos
@@ -61,13 +67,49 @@ namespace TesteFullBar.Controllers
                     Periodo = a.Periodo,
                     Nome_Curso = NomeCurso(a.Curso_Id),
                     Curso_Id = a.Curso_Id,
-                    Status = a.Status
+                    Status = AprovadoReprovado(a.Id),
                 });
             }
 
             return View(alunoVM);
         }
+        [HttpPost]
+        public IActionResult Index(string nome, string ra, string curso)
+        {
+            var alunos = from m in _context.Aluno select m;
 
+            if (!string.IsNullOrWhiteSpace(nome))
+            {
+                alunos = alunos.Where(s => s.Nome!.Contains(nome));
+            }
+            if (!string.IsNullOrWhiteSpace(ra))
+            {
+                alunos = alunos.Where(s => s.RA!.Contains(ra));
+            }
+            if (!string.IsNullOrWhiteSpace(curso))
+            {
+                var IdCurso = from n in _context.Cursos where n.Nome_Curso == curso select n;
+                //IdCurso = IdCurso.Where(o => o.Nome_Disciplina == curso);
+                var idc = IdCurso.Select(o => o.Id).ToList();
+                alunos = alunos.Where(s => s.Curso_Id == idc[0]);
+            }
+            List<AlunoVM> alunoVM = new();
+            foreach (var a in alunos)
+            {
+                alunoVM.Add(new AlunoVM()
+                {
+                    Id = a.Id,
+                    Nome = a.Nome,
+                    RA = a.RA,
+                    Periodo = a.Periodo,
+                    Nome_Curso = NomeCurso(a.Curso_Id),
+                    Curso_Id = a.Curso_Id,
+                    Status = AprovadoReprovado(a.Id),
+                });
+            }
+
+            return View(alunoVM);
+        }
         // GET: Alunos/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -86,7 +128,9 @@ namespace TesteFullBar.Controllers
                 Periodo = aluno.Periodo,
                 Nome_Curso = NomeCurso(aluno.Curso_Id),
                 Curso_Id = aluno.Curso_Id,
-                Status = aluno.Status
+                Status = AprovadoReprovado(aluno.Id),
+                DiciplinasReprovados = DisciplinaReprovado(aluno.Id),
+                Foto = aluno.Foto
             };
 
             if (aluno == null)
@@ -115,10 +159,25 @@ namespace TesteFullBar.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,RA,Periodo,Curso_Id,Status,Foto")] Aluno aluno)
+        public async Task<IActionResult> Create(IFormFile image, Aluno aluno)
         {
             if (ModelState.IsValid)
             {
+                if (image != null)
+                {
+                    string webRoopath = _webhostingEnvironment.WebRootPath;
+                    var resp = SalvandoImagem(image, aluno.Nome, webRoopath);
+                    if (resp == "Erro com a Imagem!")
+                    {
+                        ModelState.AddModelError("imagem", resp);
+                        return View();
+                    }
+                    aluno.Foto = resp;
+                }
+                else
+                {
+                    aluno.Foto = "imagemDefault.png";
+                }
                 _context.Add(aluno);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -153,7 +212,7 @@ namespace TesteFullBar.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,RA,Periodo,Curso_Id,Foto")] Aluno aluno)
+        public async Task<IActionResult> Edit(int id, IFormFile imagem, Aluno aluno)
         {
             if (id != aluno.Id)
             {
@@ -164,6 +223,21 @@ namespace TesteFullBar.Controllers
             {
                 try
                 {
+                    if (imagem != null)
+                    {
+                        string webRoopath = _webhostingEnvironment.WebRootPath;
+                        var resp = SalvandoImagem(imagem, aluno.Nome, webRoopath);
+                        if (resp == "Erro com a Imagem!")
+                        {
+                            ModelState.AddModelError("imagem", resp);
+                            return View();
+                        }
+                        aluno.Foto = resp;
+                    }
+                    else
+                    {
+                        aluno.Foto = "imagemDefault.png";
+                    }
                     _context.Update(aluno);
                     await _context.SaveChangesAsync();
                 }
@@ -219,6 +293,69 @@ namespace TesteFullBar.Controllers
         private string NomeCurso(int cursoId)
         {
             return _context.Cursos.Find(cursoId).Nome_Curso;
+        }
+        public string AprovadoReprovado(int IdAluno)
+        {
+            var notas = _context.NotaAluno.Where(o => o.Id_Aluno == IdAluno).AsQueryable();
+            if (notas.Count() > 0)
+            {
+                notas = notas.Where(x => x.Nota < 7).AsQueryable();
+                return notas.Count() > 0 ? "Reprovado" : "Aprovado";
+            }
+            else
+            {
+                return "Não Avaliado";
+            }
+            
+        }
+        public List<string> DisciplinaReprovado(int IdAluno)
+        {
+            var notas = _context.NotaAluno.Where(o => o.Id_Aluno == IdAluno && o.Nota < 7).AsQueryable();
+            if(notas.Count() > 0)
+            {
+                var idDisciplina = notas.Select(o => o.Id_Disciplina).ToList();
+                List<string> nome_Disciplina = new();
+
+                foreach (var id in idDisciplina)
+                {
+                    nome_Disciplina.Add(_context.Disciplinas.Find(id).Nome_Disciplina);
+                }
+
+                return nome_Disciplina;
+            }
+            else
+            {
+                List<string> nome_ = new();
+                nome_.Add("Não se Aplica");
+                return nome_ ;
+            }
+            
+        }
+        public string SalvandoImagem(IFormFile arquivos,string aluno, string webRoopath) 
+        {
+            string extensao = Path.GetExtension(arquivos.FileName);
+            string nomeArquivo = aluno + DateTime.Now.ToString();
+            string caractere = @"(?i)[^A-Za-zãõç.0-9]";
+            string replacement = "";
+            Regex rgx = new Regex(caractere);
+            string renomeado = rgx.Replace(nomeArquivo, replacement);
+            nomeArquivo = renomeado + extensao;
+            string path = Path.Combine(webRoopath, "imgAlunos");
+            string rotaArquivo = Path.Combine(path, nomeArquivo);
+            try
+            {
+                using (var fileStream = new FileStream(rotaArquivo, FileMode.Create))
+                {
+                    arquivos.CopyTo(fileStream);
+                }
+                return nomeArquivo;
+            }
+            catch (Exception ex)
+            {
+                var erro = "Erro com a Imagem!";
+                return erro;
+            }
+
         }
     }
 }

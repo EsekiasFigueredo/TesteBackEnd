@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Ulqr37LR8iurQT812fQe/iQgsSb5E2tPmFZRSdKB13c=",
+  "Hash": "qr7BVD4eoAHoear9mOXuxVH5bYrmtWaexOKMxP+eUOQ=",
   "Source": "TesteFullBar",
   "BasePath": "_content/TesteFullBar",
   "Mode": "Default",
@@ -83,6 +83,40 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\favicon.ico"
+    },
+    {
+      "Identity": "C:\\Users\\Esequias\\Desktop\\Omega Software\\TesteBackEnd\\TesteFullBar\\TesteFullBar\\wwwroot\\imgAlunos\\imagemDefault.png",
+      "SourceId": "TesteFullBar",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Esequias\\Desktop\\Omega Software\\TesteBackEnd\\TesteFullBar\\TesteFullBar\\wwwroot\\",
+      "BasePath": "_content/TesteFullBar",
+      "RelativePath": "imgAlunos/imagemDefault.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\imgAlunos\\imagemDefault.png"
+    },
+    {
+      "Identity": "C:\\Users\\Esequias\\Desktop\\Omega Software\\TesteBackEnd\\TesteFullBar\\TesteFullBar\\wwwroot\\imgAlunos\\MarcosAlmeida30122021093413.jpg",
+      "SourceId": "TesteFullBar",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Esequias\\Desktop\\Omega Software\\TesteBackEnd\\TesteFullBar\\TesteFullBar\\wwwroot\\",
+      "BasePath": "_content/TesteFullBar",
+      "RelativePath": "imgAlunos/MarcosAlmeida30122021093413.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\imgAlunos\\MarcosAlmeida30122021093413.jpg"
     },
     {
       "Identity": "C:\\Users\\Esequias\\Desktop\\Omega Software\\TesteBackEnd\\TesteFullBar\\TesteFullBar\\wwwroot\\js\\site.js",

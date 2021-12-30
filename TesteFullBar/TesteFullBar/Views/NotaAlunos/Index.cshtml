@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TesteFullBar.VMs.AlunoVM>
+﻿@model IEnumerable<TesteFullBar.VMs.NotasVM>
 
 @{
     ViewData["Title"] = "Lista de Notas";
@@ -33,10 +33,13 @@
                 @Html.DisplayFor(modelItem => item.Nota)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> 
+                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a>
             </td>
         </tr>
     }
+
     </tbody>
+   
 </table>
+
+ <a asp-controller="Alunos" asp-action="Index"><< Voltar</a>

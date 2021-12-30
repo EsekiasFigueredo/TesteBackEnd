@@ -26,11 +26,11 @@ namespace TesteFullBar.Controllers
         {
             var listaNotas = from m in await _context.NotaAluno.ToListAsync()
                              select m;
-            listaNotas.Where(o => o.Id_Aluno == id);
+            var notasAluno = listaNotas.Where(o => o.Id_Aluno == id);
             ViewBag.IdAluno = id;
             ViewBag.NomeAluno =  _context.Aluno.Find(id).Nome;
             List<NotasVM> notasVM = new();
-            foreach (var n in listaNotas)
+            foreach (var n in notasAluno)
             {
                 notasVM.Add(new NotasVM() 
                 { 

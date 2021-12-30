@@ -11,6 +11,7 @@ namespace TesteFullBar.VMs
         public int Id { get; set; }
         public string Nome_Curso  { get; set; } = string.Empty;
         public List<int>? Disciplina_Id  { get; set; }
+        public List<string> Disciplinas  { get; set; }  = new List<string>();
 
     }
 }

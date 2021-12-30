@@ -1,13 +1,13 @@
 ﻿@model TesteFullBar.VMs.AlunoVM
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Informações Sobre o Aluno";
 }
 
-<h1>Details</h1>
+<h1>Informações Sobre o Aluno</h1>
 
 <div>
-    <h4>Aluno</h4>
+
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -41,14 +41,32 @@
             @Html.DisplayFor(model => model.Status)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Foto)
+            Disciplina Reprovação
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Foto)
+        <dd class="col-sm-10">
+            @if (Model.DiciplinasReprovados != null)
+            {
+                @foreach (var disc in Model.DiciplinasReprovados)
+                {
+                                        
+                        @Html.DisplayFor(model => disc)<br />
+                                        
+                }
+            }
+            <p></p>
         </dd>
+       
     </dl>
 </div>
+<div class="col-md-3">
+        <div>
+            <p> <strong>Foto Aluno </strong> </p>
+
+        </div>
+        <img src="/imgAlunos/@Html.DisplayFor(model => model.Foto)" style="width: 120px; height: 120px; border-radius: 71px;" alt="Client-Profile-Image" />
+</div>
+<p> </p>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Editar</a> |
+    <a asp-action="Index">Voltar a Lista</a>
 </div>

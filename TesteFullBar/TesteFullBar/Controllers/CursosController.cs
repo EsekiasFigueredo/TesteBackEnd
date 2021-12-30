@@ -35,15 +35,21 @@ namespace TesteFullBar.Controllers
             {
                 return NotFound();
             }
-
+            CursoVM cursoVM = new();
             var curso = await _context.Cursos
                 .FirstOrDefaultAsync(m => m.Id == id);
+            cursoVM = new CursoVM()
+            {
+                Id = curso.Id,
+                Nome_Curso = curso.Nome_Curso,
+                Disciplinas = DisciplinasCurso(curso.Id)
+            };
             if (curso == null)
             {
                 return NotFound();
             }
 
-            return View(curso);
+            return View(cursoVM);
         }
 
         // GET: Cursos/Create
@@ -94,7 +100,7 @@ namespace TesteFullBar.Controllers
 
         // GET: Cursos/Edit/5
         public async Task<IActionResult> Edit(int? id)
-        {
+       {
             if (id == null)
             {
                 return NotFound();
@@ -139,23 +145,21 @@ namespace TesteFullBar.Controllers
                         Nome_Curso = cursoVM.Nome_Curso
                     });
                     await _context.SaveChangesAsync();
-                    //buscando curso adicionado
-                    //var cursoAdciconado = _context.Cursos.Where(o => o.Nome_Curso == cursoVM.Nome_Curso).FirstOrDefault();
                     //Adicionado relação entre disciplinas e curso
-                    //if (cursoVM.Disciplina_Id != null)
-                    //{
-                    //    for (int i = 0; i < cursoVM.Disciplina_Id.Count(); i++)
-                    //    {
-                    //        DisciplinaCurso dC = new()
-                    //        {
-                    //            Curso_Id = cursoAdciconado.Id,
-                    //            Disciplina_Id = cursoVM.Disciplina_Id[i]
-                    //        };
-                    //        _context.DisciplinaCursos.Update(dC);
-                    //        await _context.SaveChangesAsync();
-                    //    }
-                    //}
-                   
+                    if (cursoVM.Disciplina_Id != null)
+                    {
+                        for (int i = 0; i < cursoVM.Disciplina_Id.Count(); i++)
+                        {
+                            DisciplinaCurso dC = new()
+                            {
+                                Curso_Id = cursoVM.Id,
+                                Disciplina_Id = cursoVM.Disciplina_Id[i]
+                            };
+                            _context.DisciplinaCursos.Update(dC);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -206,5 +210,28 @@ namespace TesteFullBar.Controllers
         {
             return _context.Cursos.Any(e => e.Id == id);
         }
+        public List<string> DisciplinasCurso(int IdCurso)
+        {
+            var discplina = _context.DisciplinaCursos.Where(o => o.Curso_Id == IdCurso).AsQueryable();
+            if (discplina.Count() > 0)
+            {
+                var idDisciplina = discplina.Select(o => o.Disciplina_Id).ToList();
+                List<string> nome_Disciplina = new();
+
+                foreach (var id in idDisciplina)
+                {
+                    nome_Disciplina.Add(_context.Disciplinas.Find(id).Nome_Disciplina);
+                }
+
+                return nome_Disciplina;
+            }
+            else
+            {
+                List<string> nome_ = new();
+                nome_.Add("Não se Aplica");
+                return nome_;
+            }
+        }
+     
     }
 }
